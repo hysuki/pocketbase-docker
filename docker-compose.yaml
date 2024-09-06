@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  pocketbase:
+    build:
+      context: .
+      dockerfile: Dockerfile  # 현재 디렉토리에 있는 Dockerfile 사용
+    restart: unless-stopped
+    ports:
+      - 8090:8090
+    networks:
+      - dokploy-network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pocketbase.rule=Host(`pocketbase.youngcha.me`)
+      - traefik.http.services.pocketbase.loadbalancer.server.port=8090
+    volumes:
+      - /etc/dokploy/templates/${HASH}/data:/pb_data
+      - /etc/dokploy/templates/${HASH}/public:/pb_public
+      - /etc/dokploy/templates/${HASH}/migrations:/pb_migrations
+
+networks:
+  dokploy-network:
+    external: true
